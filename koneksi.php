@@ -3,7 +3,7 @@
 $host = "localhost";
 $user = "root";
 $password = "";
-$database = "db sip_lap";
+$database = "db sip_lab";
 
 $conn = new mysqli($host, $user, $password, $database);
 
