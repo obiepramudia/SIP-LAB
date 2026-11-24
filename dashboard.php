@@ -104,7 +104,7 @@ $riwayat = $stmt->get_result();
 
 <main class="container py-4 py-lg-5">
     <div class="p-4 p-md-5 mb-4 bg-primary text-white rounded-4 shadow-sm">
-        <span class="badge bg-light text-primary mb-3">SELAMAT DATANG, SISWA</span>
+        <span class="badge bg-light text-primary mb-3">SELAMAT DATANG</span>
         <h1 class="fw-bold display-6">Sistem Informasi Peminjaman Alat Pembelajaran</h1>
         <p class="lead text-white-50 mb-4">Kelola peminjaman alat pembelajaran sekolah dengan mudah, cepat, dan terorganisir.</p>
         <div class="d-flex flex-wrap gap-2">
