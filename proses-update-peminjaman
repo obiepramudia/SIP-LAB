@@ -1,1 +1,133 @@
 
+<?php
+require_once "auth.php";
+wajibSiswa();
+
+function kembaliEdit($pesan, $id = 0) {
+    $_SESSION["pesan"] = $pesan;
+    header("Location: " . ($id > 0 ? "edit-peminjaman.php?id=" . $id : "peminjaman-saya.php"));
+    exit;
+}
+
+if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+    header("Location: peminjaman-saya.php");
+    exit;
+}
+
+$idUser = (int) $_SESSION["id_user"];
+$idPeminjaman = (int) ($_POST["id_peminjaman"] ?? 0);
+$idAlat = (int) ($_POST["id_alat"] ?? 0);
+$idJadwal = (int) ($_POST["id_jadwal"] ?? 0);
+$jumlah = (int) ($_POST["jumlah"] ?? 0);
+
+if ($idPeminjaman <= 0 || $idAlat <= 0 || $idJadwal <= 0 || $jumlah <= 0) {
+    kembaliEdit("Data perubahan tidak valid.", $idPeminjaman);
+}
+
+try {
+    $conn->begin_transaction();
+
+    // Kunci dan validasi pengajuan: harus milik siswa dan masih menunggu.
+    $stmt = $conn->prepare("
+        SELECT id_jadwal
+        FROM peminjaman
+        WHERE id_peminjaman = ? AND id_user = ?
+          AND status_peminjaman = 'menunggu'
+        FOR UPDATE
+    ");
+    $stmt->bind_param("ii", $idPeminjaman, $idUser);
+    $stmt->execute();
+    $pengajuan = $stmt->get_result()->fetch_assoc();
+
+    if (!$pengajuan) {
+        throw new Exception("Pengajuan tidak ditemukan atau sudah tidak bisa diubah.");
+    }
+
+    // Periksa stok alat yang dipilih.
+    $stmt = $conn->prepare("
+        SELECT jumlah, status FROM alat WHERE id_alat = ? FOR UPDATE
+    ");
+    $stmt->bind_param("i", $idAlat);
+    $stmt->execute();
+    $alat = $stmt->get_result()->fetch_assoc();
+
+    if (!$alat || $alat["status"] !== "tersedia" || $jumlah > (int)$alat["jumlah"]) {
+        throw new Exception("Alat tidak tersedia atau stok tidak mencukupi.");
+    }
+
+    // Periksa jadwal yang dipilih.
+    $stmt = $conn->prepare("
+        SELECT tanggal, status FROM jadwal WHERE id_jadwal = ? FOR UPDATE
+    ");
+    $stmt->bind_param("i", $idJadwal);
+    $stmt->execute();
+    $jadwal = $stmt->get_result()->fetch_assoc();
+
+    if (!$jadwal || $jadwal["status"] !== "tersedia" || $jadwal["tanggal"] < date("Y-m-d")) {
+        // Jadwal lama milik pengajuan boleh tetap dipakai walaupun status jadwal berubah.
+        if (!$jadwal || (int)$pengajuan["id_jadwal"] !== $idJadwal || $jadwal["tanggal"] < date("Y-m-d")) {
+            throw new Exception("Jadwal tidak tersedia.");
+        }
+    }
+
+    // Pastikan jadwal tidak dipakai pengajuan aktif lainnya.
+    $stmt = $conn->prepare("
+        SELECT COUNT(*) AS total
+        FROM peminjaman
+        WHERE id_jadwal = ? AND id_peminjaman <> ?
+          AND status_peminjaman IN ('menunggu','disetujui','sedang_dipinjam')
+    ");
+    $stmt->bind_param("ii", $idJadwal, $idPeminjaman);
+    $stmt->execute();
+    $cek = $stmt->get_result()->fetch_assoc();
+
+    if ((int)$cek["total"] > 0) {
+        throw new Exception("Jadwal sudah digunakan oleh pengajuan lain.");
+    }
+
+    // Perbarui jadwal dan tanggal pengajuan.
+    $stmt = $conn->prepare("
+        UPDATE peminjaman
+        SET id_jadwal = ?, tanggal_peminjaman = ?
+        WHERE id_peminjaman = ? AND id_user = ? AND status_peminjaman = 'menunggu'
+    ");
+    $stmt->bind_param("isii", $idJadwal, $jadwal["tanggal"], $idPeminjaman, $idUser);
+    $stmt->execute();
+
+    // Perbarui detail alat dan jumlah.
+    $stmt = $conn->prepare("
+        UPDATE detail_peminjaman
+        SET id_alat = ?, jumlah = ?
+        WHERE id_peminjaman = ?
+    ");
+    $stmt->bind_param("iii", $idAlat, $jumlah, $idPeminjaman);
+    $stmt->execute();
+
+    if ($stmt->affected_rows === 0) {
+        // affected_rows bisa 0 jika nilainya tidak berubah; pastikan detail memang ada.
+        $cekDetail = $conn->prepare("SELECT id_detail FROM detail_peminjaman WHERE id_peminjaman = ? LIMIT 1");
+        $cekDetail->bind_param("i", $idPeminjaman);
+        $cekDetail->execute();
+        if (!$cekDetail->get_result()->fetch_assoc()) {
+            throw new Exception("Detail peminjaman tidak ditemukan.");
+        }
+    }
+
+    $pesanNotif = "Pengajuan peminjaman alat telah diperbarui.";
+    $stmt = $conn->prepare("
+        INSERT INTO notifikasi (id_user, pesan, status_baca)
+        VALUES (?, ?, 'belum_dibaca')
+    ");
+    $stmt->bind_param("is", $idUser, $pesanNotif);
+    $stmt->execute();
+
+    $conn->commit();
+    $_SESSION["pesan"] = "Pengajuan berhasil diperbarui.";
+    header("Location: peminjaman-saya.php");
+    exit;
+
+} catch (Throwable $e) {
+    $conn->rollback();
+    kembaliEdit("Perubahan gagal: " . $e->getMessage(), $idPeminjaman);
+}
+?>
