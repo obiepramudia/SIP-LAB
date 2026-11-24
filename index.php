@@ -74,161 +74,102 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     }
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Login Pengguna - SIP-LAB</title>
-
-    <link rel="stylesheet" href="style.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
 </head>
-
-<body class="login-page">
-
-    <div class="login-container">
-
-        <!-- BAGIAN KIRI -->
-        <div class="login-illustration">
-
-            <div class="login-brand">
-                <div class="login-brand-icon">S</div>
+<body class="bg-light">
+    <main class="container min-vh-100 d-flex align-items-center justify-content-center py-5">
+        <div class="row justify-content-center w-100">
+            <div class="col-12 col-xl-10">
+              <div class="row g-0 bg-white rounded-4 shadow-lg overflow-hidden">
+            <section class="col-lg-6 bg-primary text-white p-4 p-md-5 d-flex flex-column justify-content-between">
                 <div>
-                    <h3>SIP-LAB</h3>
-                    <span>Sistem Peminjaman Alat</span>
-                </div>
-            </div>
-
-            <div class="illustration-content">
-                <span class="illustration-label">
-                    PORTAL PENGGUNA
-                </span>
-
-                <h1>
-                    Belajar Lebih Mudah
-                    dengan Teknologi.
-                </h1>
-
-                <p>
-                    Akses informasi alat pembelajaran dan ajukan
-                    peminjaman alat sekolah dengan mudah melalui
-                    sistem informasi SIP-LAB.
-                </p>
-
-                <div class="illustration-symbol">
-                    <div class="symbol-box">▣</div>
-                    <div class="symbol-circle"></div>
-                </div>
-            </div>
-
-            <div class="illustration-footer">
-                SIP-LAB © 2026
-            </div>
-
-        </div>
-
-        <!-- BAGIAN KANAN -->
-        <div class="login-form-section">
-
-            <div class="login-form-box">
-
-                <div class="login-mobile-brand">
-                    <div class="login-brand-icon">S</div>
-                    <strong>SIP-LAB</strong>
-                </div>
-
-                <span class="login-welcome">
-                    SELAMAT DATANG
-                </span>
-
-                <h2>PORTAL PENGGUNA</h2>
-
-                <p class="login-description">
-                    Silakan masuk menggunakan akun
-                    yang telah terdaftar pada Sistem Informasi Peminjaman Alat.
-                </p>
-
-                <?php if ($error !== ""): ?>
-                    <div class="login-error">
-                        <?php echo htmlspecialchars($error, ENT_QUOTES, "UTF-8"); ?>
+                    <div class="d-flex align-items-center gap-3 mb-5">
+                        <div class="bg-white text-primary rounded-3 fw-bold fs-3 px-3 py-2">S</div>
+                        <div>
+                            <h3 class="fw-bold mb-0">SIP-LAB</h3>
+                            <span class="text-white-50">Sistem Peminjaman Alat</span>
+                        </div>
                     </div>
-                <?php endif; ?>
+                    <span class="badge bg-light text-primary mb-3">PORTAL PENGGUNA</span>
+                    <h1 class="display-6 fw-bold mb-3">Belajar Lebih Mudah dengan Teknologi.</h1>
+                    <p class="text-white-50 fs-5">
+                        Akses informasi alat pembelajaran dan ajukan peminjaman
+                        alat sekolah dengan mudah melalui sistem informasi SIP-LAB.
+                    </p>
+                    <div class="mt-5 text-center">
+                        <i class="bi bi-laptop display-1"></i>
+                        <i class="bi bi-projector display-1 ms-3"></i>
+                    </div>
+                </div>
+                <div class="small text-white-50 mt-5">SIP-LAB © 2026</div>
+            </section>
 
-                <form method="POST" action="index.php">
+            <section class="col-lg-6 p-4 p-md-5 d-flex align-items-center">
+                <div class="w-100">
+                    <div class="d-lg-none text-primary fw-bold fs-4 mb-4">SIP-LAB</div>
+                    <span class="text-primary fw-semibold small">SELAMAT DATANG</span>
+                    <h2 class="fw-bold mt-2 mb-3">PORTAL PENGGUNA</h2>
+                    <p class="text-secondary mb-4">
+                        Silakan masuk menggunakan akun yang telah terdaftar
+                        pada Sistem Informasi Peminjaman Alat.
+                    </p>
 
-                    <label for="username">Username</label>
+                    <?php if ($error !== ""): ?>
+                        <div class="alert alert-danger" role="alert">
+                            <?php echo htmlspecialchars($error, ENT_QUOTES, "UTF-8"); ?>
+                        </div>
+                    <?php endif; ?>
 
-                    <input
-                        type="text"
-                        id="username"
-                        name="username"
-                        placeholder="Masukkan username"
-                        value="<?php echo htmlspecialchars($_POST["username"] ?? "", ENT_QUOTES, "UTF-8"); ?>"
-                        autocomplete="username"
-                        required
-                    >
-
-                    <label for="password">Password</label>
-
-                    <div class="password-wrapper">
-                        <input
-                            type="password"
-                            id="password"
-                            name="password"
-                            placeholder="Masukkan password"
-                            autocomplete="current-password"
-                            required
-                        >
-
-                        <button
-                            type="button"
-                            class="toggle-password"
-                            onclick="togglePassword()"
-                            aria-label="Tampilkan password"
-                        >
-                            Lihat
+                    <form method="POST" action="index.php">
+                        <div class="mb-3">
+                            <label for="username" class="form-label fw-semibold">Username</label>
+                            <input type="text" class="form-control form-control-lg" id="username"
+                                   name="username" placeholder="Masukkan username"
+                                   value="<?php echo htmlspecialchars($_POST["username"] ?? "", ENT_QUOTES, "UTF-8"); ?>"
+                                   autocomplete="username" required>
+                        </div>
+                        <div class="mb-4">
+                            <label for="password" class="form-label fw-semibold">Password</label>
+                            <div class="input-group input-group-lg">
+                                <input type="password" class="form-control" id="password" name="password"
+                                       placeholder="Masukkan password" autocomplete="current-password" required>
+                                <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-lg w-100">
+                            Masuk ke Dashboard <i class="bi bi-arrow-right ms-2"></i>
                         </button>
+                    </form>
+
+                    <div class="alert alert-info mt-4 mb-0">
+                        <i class="bi bi-info-circle me-2"></i>
+                        Gunakan username dan password akun yang telah terdaftar pada sistem.
                     </div>
-
-                    <button type="submit" class="login-button">
-                        Masuk ke Dashboard
-                        <span>→</span>
-                    </button>
-
-                </form>
-
-                <div class="login-note">
-                    <span>ⓘ</span>
-                     Gunakan username dan password akun yang
-    telah terdaftar pada sistem.
                 </div>
-
+            </section>
+              </div>
             </div>
-
-            <div class="login-bottom">
-                Sistem Informasi Peminjaman Alat Pembelajaran
-            </div>
-
         </div>
-
-    </div>
+    </main>
 
     <script>
-        function togglePassword() {
+        document.getElementById("togglePassword").addEventListener("click", function () {
             const password = document.getElementById("password");
-            const button = document.querySelector(".toggle-password");
-
-            if (password.type === "password") {
-                password.type = "text";
-                button.textContent = "Sembunyikan";
-            } else {
-                password.type = "password";
-                button.textContent = "Lihat";
-            }
-        }
+            const icon = this.querySelector("i");
+            const tampil = password.type === "password";
+            password.type = tampil ? "text" : "password";
+            icon.className = tampil ? "bi bi-eye-slash" : "bi bi-eye";
+        });
     </script>
-
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
