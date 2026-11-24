@@ -72,216 +72,115 @@ $stmt->bind_param("i", $idUser);
 $stmt->execute();
 $riwayat = $stmt->get_result();
 ?>
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Dashboard - SIP-LAB</title>
-    <link rel="stylesheet" href="style.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
 </head>
-<body class="dashboard-page">
-
-<div class="app-layout">
-
-    <!-- SIDEBAR -->
-    <aside class="sidebar">
-
-        <div class="brand">
-            <div class="brand-icon">S</div>
-            <div>
-                <h3>SIP-LAB</h3>
-                <span>Peminjaman Alat</span>
+<body class="bg-light">
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="dashboard.php"><i class="bi bi-mortarboard-fill me-2"></i>SIP-LAB</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSiswa" aria-controls="navbarSiswa" aria-expanded="false" aria-label="Buka navigasi">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSiswa">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item"><a class="nav-link active" href="dashboard.php">Dashboard</a></li>
+                <li class="nav-item"><a class="nav-link" href="daftar-alat.php">Daftar Alat</a></li>
+                <li class="nav-item"><a class="nav-link" href="peminjaman-saya.php">Peminjaman Saya</a></li>
+            </ul>
+            <div class="d-flex align-items-center gap-3 text-white">
+                <span class="small"><i class="bi bi-person-circle me-1"></i><?php echo e($nama); ?></span>
+                <a href="logout.php" class="btn btn-outline-light btn-sm">Keluar</a>
             </div>
         </div>
+    </div>
+</nav>
 
-        <p class="sidebar-label">MENU UTAMA</p>
-
-        <nav class="sidebar-menu">
-            <a href="dashboard.php" class="active">
-                <span>▦</span> Dashboard
-            </a>
-
-            <a href="daftar-alat.php">
-                <span>▣</span> Daftar Alat
-            </a>
-
-            <a href="peminjaman-saya.php">
-                <span>▤</span> Peminjaman Saya
-            </a>
-        </nav>
-
-        <div class="sidebar-profile">
-            <div class="profile-avatar">
-                <?php echo strtoupper(substr($nama, 0, 1)); ?>
-            </div>
-
-            <div class="profile-info">
-                <strong><?php echo e($nama); ?></strong>
-                <span>Siswa - <?php echo e($kelas); ?></span>
-            </div>
+<main class="container py-4 py-lg-5">
+    <div class="p-4 p-md-5 mb-4 bg-primary text-white rounded-4 shadow-sm">
+        <span class="badge bg-light text-primary mb-3">SELAMAT DATANG, SISWA</span>
+        <h1 class="fw-bold display-6">Sistem Informasi Peminjaman Alat Pembelajaran</h1>
+        <p class="lead text-white-50 mb-4">Kelola peminjaman alat pembelajaran sekolah dengan mudah, cepat, dan terorganisir.</p>
+        <div class="d-flex flex-wrap gap-2">
+            <a href="peminjaman-saya.php" class="btn btn-light text-primary fw-semibold">Ajukan Peminjaman</a>
+            <a href="daftar-alat.php" class="btn btn-outline-light">Lihat Daftar Alat</a>
         </div>
+    </div>
 
-    </aside>
+    <div class="row g-3 mb-5">
+        <div class="col-6 col-lg-3">
+            <div class="card border-0 shadow-sm h-100"><div class="card-body">
+                <div class="text-primary fs-3 mb-2"><i class="bi bi-box-seam"></i></div>
+                <h2 class="fw-bold mb-1"><?php echo $totalAlat; ?></h2><p class="text-secondary mb-0">Alat Tersedia</p>
+            </div></div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="card border-0 shadow-sm h-100"><div class="card-body">
+                <div class="text-warning fs-3 mb-2"><i class="bi bi-clock-history"></i></div>
+                <h2 class="fw-bold mb-1"><?php echo $totalMenunggu; ?></h2><p class="text-secondary mb-0">Menunggu Persetujuan</p>
+            </div></div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="card border-0 shadow-sm h-100"><div class="card-body">
+                <div class="text-success fs-3 mb-2"><i class="bi bi-clipboard-check"></i></div>
+                <h2 class="fw-bold mb-1"><?php echo $totalPeminjaman; ?></h2><p class="text-secondary mb-0">Total Peminjaman</p>
+            </div></div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="card border-0 shadow-sm h-100"><div class="card-body">
+                <div class="text-info fs-3 mb-2"><i class="bi bi-people"></i></div>
+                <h2 class="fw-bold mb-1"><?php echo e($kelas); ?></h2><p class="text-secondary mb-0">Kelas Siswa</p>
+            </div></div>
+        </div>
+    </div>
 
-    <!-- KONTEN UTAMA -->
-    <main class="main-content">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+        <div><h2 class="h4 fw-bold mb-1">Peminjaman Terbaru</h2><p class="text-secondary mb-0">Daftar pengajuan peminjaman alat milikmu.</p></div>
+        <a href="peminjaman-saya.php" class="btn btn-outline-primary btn-sm">Lihat Semua <i class="bi bi-arrow-right"></i></a>
+    </div>
 
-        <header class="topbar">
-            <div class="search-placeholder">
-                SIP-LAB / Dashboard
-            </div>
-
-            <div class="topbar-user">
-                <span>Portal Siswa</span>
-                <a href="logout.php">Keluar</a>
-            </div>
-        </header>
-
-        <section class="content-area">
-
-            <!-- HERO -->
-            <div class="hero-banner">
-                <div class="hero-text">
-                    <span class="hero-label">SELAMAT DATANG, SISWA</span>
-
-                    <h1>
-                        Sistem Informasi<br>
-                        Peminjaman Alat Pembelajaran
-                    </h1>
-
-                    <p>
-                        Kelola peminjaman alat pembelajaran sekolah
-                        dengan mudah, cepat, dan terorganisir.
-                    </p>
-
-                    <div class="hero-buttons">
-                        <a href="peminjaman-saya.php" class="btn-white">
-                            Ajukan Peminjaman
-                        </a>
-
-                        <a href="daftar-alat.php" class="btn-outline">
-                            Lihat Daftar Alat
-                        </a>
-                    </div>
-                </div>
-
-                <div class="hero-decoration">▣</div>
-            </div>
-
-            <!-- STATISTIK -->
-            <div class="stats-grid">
-
-                <div class="stat-card">
-                    <div class="stat-icon blue">▣</div>
-                    <h2><?php echo $totalAlat; ?></h2>
-                    <p>Alat Tersedia</p>
-                </div>
-
-                <div class="stat-card">
-                    <div class="stat-icon orange">◷</div>
-                    <h2><?php echo $totalMenunggu; ?></h2>
-                    <p>Menunggu Persetujuan</p>
-                </div>
-
-                <div class="stat-card">
-                    <div class="stat-icon green">▤</div>
-                    <h2><?php echo $totalPeminjaman; ?></h2>
-                    <p>Total Peminjaman</p>
-                </div>
-
-                <div class="stat-card">
-                    <div class="stat-icon purple">♙</div>
-                    <h2><?php echo e($kelas); ?></h2>
-                    <p>Kelas Siswa</p>
-                </div>
-
-            </div>
-
-            <!-- RIWAYAT TERBARU -->
-            <div class="section-heading">
-                <div>
-                    <h2>Peminjaman Terbaru</h2>
-                    <p>Daftar pengajuan peminjaman alat milikmu.</p>
-                </div>
-
-                <a href="peminjaman-saya.php">Lihat Semua →</a>
-            </div>
-
-            <div class="table-card">
-                <table>
-                    <thead>
+    <div class="card border-0 shadow-sm">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light"><tr><th>No.</th><th>Nama Alat</th><th>Tanggal</th><th>Jadwal</th><th>Status</th></tr></thead>
+                <tbody>
+                <?php if ($riwayat->num_rows > 0): ?>
+                    <?php $no = 1; while ($row = $riwayat->fetch_assoc()): ?>
+                        <?php
+                        $status = $row["status_peminjaman"];
+                        $warnaStatus = [
+                            "menunggu" => "warning",
+                            "disetujui" => "success",
+                            "ditolak" => "danger",
+                            "sedang_dipinjam" => "info",
+                            "selesai" => "secondary"
+                        ][$status] ?? "secondary";
+                        ?>
                         <tr>
-                            <th>No.</th>
-                            <th>Nama Alat</th>
-                            <th>Tanggal</th>
-                            <th>Jadwal</th>
-                            <th>Status</th>
+                            <td><?php echo $no++; ?></td>
+                            <td><?php echo e($row["daftar_alat"] ?? "-"); ?></td>
+                            <td><?php echo date("d-m-Y", strtotime($row["tanggal_peminjaman"])); ?></td>
+                            <td><?php echo date("H:i", strtotime($row["waktu_mulai"])) . " - " . date("H:i", strtotime($row["waktu_selesai"])); ?></td>
+                            <td><span class="badge text-bg-<?php echo $warnaStatus; ?>"><?php echo ucfirst(str_replace("_", " ", $status)); ?></span></td>
                         </tr>
-                    </thead>
+                    <?php endwhile; ?>
+                <?php else: ?>
+                    <tr><td colspan="5" class="text-center text-secondary py-4">Belum ada riwayat peminjaman.</td></tr>
+                <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
 
-                    <tbody>
-                    <?php if ($riwayat->num_rows > 0): ?>
-                        <?php $no = 1; ?>
-                        <?php while ($row = $riwayat->fetch_assoc()): ?>
-
-                            <tr>
-                                <td><?php echo $no++; ?></td>
-
-                                <td>
-                                    <?php echo e($row["daftar_alat"] ?? "-"); ?>
-                                </td>
-
-                                <td>
-                                    <?php
-                                    echo date(
-                                        "d-m-Y",
-                                        strtotime($row["tanggal_peminjaman"])
-                                    );
-                                    ?>
-                                </td>
-
-                                <td>
-                                    <?php
-                                    echo date("H:i", strtotime($row["waktu_mulai"]))
-                                        . " - " .
-                                        date("H:i", strtotime($row["waktu_selesai"]));
-                                    ?>
-                                </td>
-
-                                <td>
-                                    <span class="status-badge status-<?php echo e($row["status_peminjaman"]); ?>">
-                                        <?php echo ucfirst(str_replace("_", " ", $row["status_peminjaman"])); ?>
-                                    </span>
-                                </td>
-                            </tr>
-
-                        <?php endwhile; ?>
-
-                    <?php else: ?>
-                        <tr>
-                            <td colspan="5" class="empty-data">
-                                Belum ada riwayat peminjaman.
-                            </td>
-                        </tr>
-                    <?php endif; ?>
-                    </tbody>
-                </table>
-            </div>
-
-            <footer class="page-footer">
-                SIP-LAB © 2026 - Sistem Informasi Peminjaman Alat Pembelajaran
-            </footer>
-
-        </section>
-    </main>
-
-</div>
-
+    <footer class="text-center text-secondary small mt-5">SIP-LAB © 2026 - Sistem Informasi Peminjaman Alat Pembelajaran</footer>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
-
-<?php
-$stmt->close();
-?>
+<?php $stmt->close(); ?>
