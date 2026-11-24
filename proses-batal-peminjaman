@@ -1,1 +1,73 @@
+<?php
+require_once "auth.php";
+wajibSiswa();
+
+if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+    header("Location: peminjaman-saya.php");
+    exit;
+}
+
+$idUser = (int) $_SESSION["id_user"];
+$idPeminjaman = (int) ($_POST["id_peminjaman"] ?? 0);
+
+if ($idPeminjaman <= 0) {
+    $_SESSION["pesan"] = "Pengajuan tidak valid.";
+    header("Location: peminjaman-saya.php");
+    exit;
+}
+
+try {
+    $conn->begin_transaction();
+
+    // Hanya pemilik pengajuan dengan status menunggu yang boleh membatalkan.
+    $stmt = $conn->prepare("
+        SELECT id_peminjaman
+        FROM peminjaman
+        WHERE id_peminjaman = ? AND id_user = ?
+          AND status_peminjaman = 'menunggu'
+        FOR UPDATE
+    ");
+    $stmt->bind_param("ii", $idPeminjaman, $idUser);
+    $stmt->execute();
+
+    if (!$stmt->get_result()->fetch_assoc()) {
+        throw new Exception("Pengajuan tidak ditemukan atau sudah tidak bisa dibatalkan.");
+    }
+
+    // Hapus detail terlebih dahulu agar tidak menyisakan data detail.
+    $stmt = $conn->prepare("DELETE FROM detail_peminjaman WHERE id_peminjaman = ?");
+    $stmt->bind_param("i", $idPeminjaman);
+    $stmt->execute();
+
+    // Hapus pengajuan milik siswa yang sedang login.
+    $stmt = $conn->prepare("
+        DELETE FROM peminjaman
+        WHERE id_peminjaman = ? AND id_user = ?
+          AND status_peminjaman = 'menunggu'
+    ");
+    $stmt->bind_param("ii", $idPeminjaman, $idUser);
+    $stmt->execute();
+
+    if ($stmt->affected_rows !== 1) {
+        throw new Exception("Pengajuan gagal dibatalkan.");
+    }
+
+    $pesanNotif = "Pengajuan peminjaman alat telah dibatalkan.";
+    $stmt = $conn->prepare("
+        INSERT INTO notifikasi (id_user, pesan, status_baca)
+        VALUES (?, ?, 'belum_dibaca')
+    ");
+    $stmt->bind_param("is", $idUser, $pesanNotif);
+    $stmt->execute();
+
+    $conn->commit();
+    $_SESSION["pesan"] = "Pengajuan berhasil dibatalkan.";
+} catch (Throwable $e) {
+    $conn->rollback();
+    $_SESSION["pesan"] = "Pembatalan gagal: " . $e->getMessage();
+}
+
+header("Location: peminjaman-saya.php");
+exit;
+?>
 
